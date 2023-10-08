@@ -1,0 +1,15 @@
+server:
+  port: 8090
+spring:
+  datasource:
+    url: jdbc:h2:mem:userdb
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.Dialect
+    hibernate:
+      ddl-auto: none
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always

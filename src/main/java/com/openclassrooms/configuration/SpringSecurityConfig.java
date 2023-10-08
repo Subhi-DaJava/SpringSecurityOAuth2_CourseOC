@@ -2,7 +2,9 @@ package com.openclassrooms.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -19,6 +21,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SpringSecurityConfig {
+
+    private final CustomUserDetailsService customUserDetailsService;
+
+    public SpringSecurityConfig(CustomUserDetailsService customUserDetailsService) {
+        this.customUserDetailsService = customUserDetailsService;
+    }
+
     /**
      * L’annotation @Bean aura pour conséquence de charger dans le contexte Spring l’objet résultant de la méthode filterChain.
      * Ainsi Spring Security pourra s’en servir.
@@ -30,6 +39,7 @@ public class SpringSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // La chaîne de filtres de sécurité est programmée avec HTTPSecurity.
         return http
+
                 .authorizeHttpRequests(auth -> { // définir les rôles
                     auth.requestMatchers("/admin").hasRole("ADMIN"); // l'association des rôles USER (utilisateur) et ADMIN (administrateur) avec des pages.
                     auth.requestMatchers("/user").hasRole("USER");
@@ -65,6 +75,23 @@ public class SpringSecurityConfig {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * Cette méthode permet d’indiquer à Spring Security d’utiliser la classe CustomUserDetailsService pour authentifier des utilisateurs.
+     * @param http SecurityHttp
+     * @param bCryptPasswordEncoder BCryptPasswordEncoder
+     * @return Auth
+     * @throws Exception ex
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http, BCryptPasswordEncoder bCryptPasswordEncoder) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder = http
+                .getSharedObject(AuthenticationManagerBuilder.class);
+
+        authenticationManagerBuilder.userDetailsService(customUserDetailsService)
+                .passwordEncoder(bCryptPasswordEncoder);
+        return authenticationManagerBuilder.build();
     }
 
 }
