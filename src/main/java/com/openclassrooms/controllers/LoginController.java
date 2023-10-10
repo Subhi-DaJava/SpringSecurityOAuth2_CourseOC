@@ -1,10 +1,13 @@
 package com.openclassrooms.controllers;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,13 +40,14 @@ public class LoginController {
 
 
     @GetMapping("/")
-    public String getUserInfo(Principal user) {
+    public String getUserInfo(Principal user, @AuthenticationPrincipal OidcUser oidcUser) {
+
         StringBuilder userInfo = new StringBuilder();
 
         if(user instanceof UsernamePasswordAuthenticationToken) {
             userInfo.append(getUsernamePasswordLoginInfo(user));
         } else if(user instanceof OAuth2AuthenticationToken) {
-            userInfo.append(getOAuth2LoginInfo(user));
+            userInfo.append(getOAuth2LoginInfo(user, oidcUser));
         }
 
         return userInfo.toString();
@@ -64,7 +68,8 @@ public class LoginController {
         return usernameInfo;
     }
 
-    private StringBuffer getOAuth2LoginInfo(Principal user)  {
+    private StringBuffer getOAuth2LoginInfo(Principal user, OidcUser oidcUser)  {
+
         StringBuffer protectedInfo = new StringBuffer();
         OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) user;
         OAuth2AuthorizedClient authClient = auth2AuthorizedClientService.loadAuthorizedClient(
@@ -76,6 +81,15 @@ public class LoginController {
             protectedInfo.append("Welcome, ").append(userAttributes.get("name")).append("<br><br>");
             protectedInfo.append("e-mail, ").append(userAttributes.get("email")).append("<br><br>");
             protectedInfo.append("Access token : ").append(userToken).append("<br><br>");
+            OidcIdToken idToken = oidcUser.getIdToken();
+            if(idToken != null)  {
+                protectedInfo.append("idToken value : ").append(idToken.getTokenValue()).append("<br>");
+                protectedInfo.append("Token mapped values <br>");
+                Map<String, Object> claims = idToken.getClaims();
+                for (String key: claims.keySet()) {
+                    protectedInfo.append(" ").append(key).append(" : ").append(claims.get(key)).append("<br>");
+                }
+            }
 
         } else {
             protectedInfo.append("NotAuthenticated");
