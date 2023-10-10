@@ -41,12 +41,12 @@ public class SpringSecurityConfig {
         return http
 
                 .authorizeHttpRequests(auth -> { // définir les rôles
+                    auth.requestMatchers("/swagger-ui.html.").permitAll();
                     auth.requestMatchers("/admin").hasRole("ADMIN"); // l'association des rôles USER (utilisateur) et ADMIN (administrateur) avec des pages.
                     auth.requestMatchers("/user").hasRole("USER");
                     auth.anyRequest().authenticated(); // permettre d’utiliser le formulaire ci-dessous pour l’authentification.
                 })
                 .formLogin(Customizer.withDefaults())// Démarrer par le formulaire Spring Security par défaut, en utilisant la méthode `formLogin (Customizer.withDefaults())`
-                .oauth2Login(Customizer.withDefaults())
                 .build(); // envoyer une implémentation de SecurityFilterChain
     }
 
