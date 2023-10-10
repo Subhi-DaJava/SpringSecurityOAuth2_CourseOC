@@ -46,7 +46,7 @@ public class SpringSecurityConfig {
                     auth.anyRequest().authenticated(); // permettre d’utiliser le formulaire ci-dessous pour l’authentification.
                 })
                 .formLogin(Customizer.withDefaults())// Démarrer par le formulaire Spring Security par défaut, en utilisant la méthode `formLogin (Customizer.withDefaults())`
-                .oauth2Login(Customizer.withDefaults())
+               // .oauth2Login(Customizer.withDefaults())
                 .build(); // envoyer une implémentation de SecurityFilterChain
     }
 
