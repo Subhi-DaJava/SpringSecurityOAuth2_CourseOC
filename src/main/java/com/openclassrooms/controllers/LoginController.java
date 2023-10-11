@@ -39,7 +39,7 @@ public class LoginController {
 //    }
 
 
-    @GetMapping("/")
+    @GetMapping("/*")
     public String getUserInfo(Principal user, @AuthenticationPrincipal OidcUser oidcUser) {
 
         StringBuilder userInfo = new StringBuilder();

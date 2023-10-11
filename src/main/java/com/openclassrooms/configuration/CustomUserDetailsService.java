@@ -21,9 +21,8 @@ import java.util.List;
  * La configuration de Spring Security doit prendre en compte cette classe via un AuthenticationManager.
  */
 @Slf4j
-@Service
 public class CustomUserDetailsService implements UserDetailsService {
-    @Autowired
+
     private UserRepository userRepository;
 
     /**
