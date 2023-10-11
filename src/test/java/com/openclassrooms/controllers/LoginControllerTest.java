@@ -68,4 +68,20 @@ class LoginControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    @WithMockUser
+    public void shouldReturn403Page() throws Exception {
+        mockMvc.perform(get("/admin"))
+                .andDo(print())
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @WithMockUser
+    public void shouldReturn404Page() throws Exception {
+        mockMvc.perform(get("/admin/profile"))
+                .andDo(print())
+                .andExpect(status().is4xxClientError());
+    }
+
 }
